@@ -42,9 +42,9 @@
             android:layout_width="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_below="@id/city"
-            android:textSize="90sp"
+            android:textSize="80sp"
             android:textColor="@color/write"
-            android:text="-36°"/>
+            android:text=""/>
 
         <TextView
             android:id="@+id/weather"
@@ -52,7 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_below="@id/degrees"
-            android:textSize="120sp"
+            android:textSize="150sp"
             android:gravity="center"
             android:textColor="@color/write"
             android:text=""/>

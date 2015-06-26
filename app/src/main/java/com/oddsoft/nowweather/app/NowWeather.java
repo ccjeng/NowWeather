@@ -1,20 +1,23 @@
 package com.oddsoft.nowweather.app;
 
 import android.app.Application;
-import android.text.TextUtils;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 
-public class Singleton extends Application {
+public class NowWeather extends Application {
 
-    public static final String TAG = Singleton.class.getSimpleName();
+    public static final String TAG = NowWeather.class.getSimpleName();
+
+    // Debugging switch
+    public static final boolean APPDEBUG = false;
+
+    public static final String FLICKR_API_KEY = "dc7cb6cc8e546dd0fb6d3a1ba5bfa971";
 
     private RequestQueue mRequestQueue;
 
-    private static Singleton mInstance;
+    private static NowWeather mInstance;
 
     @Override
     public void onCreate() {
@@ -27,7 +30,7 @@ public class Singleton extends Application {
      * Singleton main method. Provides the global static instance of the helper class.
      * @return The Singleton instance.
      */
-    public static synchronized Singleton getInstance() {
+    public static synchronized NowWeather getInstance() {
         return mInstance;
     }
 
