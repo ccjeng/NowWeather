@@ -1,6 +1,66 @@
 <resources>
     <string name="app_name">NowWeather</string>
 
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+
+    <string name="humidity">Humidity</string>
+    <string name="pressure">Pressure</string>
+
+    <!--http://erikflowers.github.io/weather-icons/cheatsheet/-->
+
+    <!--Thunderstorm-->
+    <string name="wi_thunderstorm">&#xf01e;</string> <!--201, 202, 211, 212, 221, 232 -->
+    <string name="wi_storm_showers">&#xf01e;</string> <!--200, 210, 230, 231-->
+    <!--Drizzle-->
+    <string name="wi_showers">&#xf01a;</string> <!--300, 301, 302, 310, 311, 312, 313, 314, 321-->
+
+    <!--Rain-->
+    <string name="wi_rain">&#xf01a;</string> <!--500, 501, 520, 521-->
+    <string name="wi_rain_wind">&#xf018;</string> <!--504, 522, 531-->
+    <string name="wi_rain_mix">&#xf017;</string> <!--502, 503 -->
+    <string name="wi_sprinkle">&#xf01c;</string> <!--511-->
+
+    <!--Snow-->
+    <string name="wi_snow">&#xf01b;</string> <!--6*-->
+
+    <!--Atmosphere-->
+    <string name="wi_fog">&#xf014;</string> <!--700, 711, 721, 731, 741, 751, 761, 762-->
+    <string name="wi_tornado">&#xf056;</string> <!--781, 900, 901, 902, 960, 961, 962-->
+    <string name="wi_strong_wind">&#xf050;</string> <!--771, 957, 958, 959-->
+
+    <!--Clouds-->
+    <string name="wi_day_sunny">&#xf00d;</string> <!--800-->
+    <string name="wi_day_cloudy">&#xf002;</string><!--801-->
+    <string name="wi_day_sunny_overcast">&#xf00c;</string> <!--802-->
+    <string name="wi_cloudy">&#xf013;</string> <!--803, 804-->
+
+    <!--Extreme-->
+    <string name="wi_windy">&#xf021;</string> <!--905-->
+    <string name="wi_hail">&#xf015;</string> <!--906-->
+    <string name="wi_thermometer_exterior">&#xf053;</string> <!--903-->
+    <string name="wi_thermometer">&#xf055;</string> <!--904-->
+
+    <!--Additional-->
+    <string name="wi_cloud">&#xf041;</string> <!--951-->
+    <string name="wi_cloudy_windy">&#xf012;</string> <!--952, 953, 954-->
+    <string name="wi_cloudy_gusts">&#xf011;</string> <!--955, 956-->
+
+    <string name="wi_night_alt_cloudy_gusts">&#xf022;</string>
+    <string name="wi_night_alt_cloudy_windy">&#xf023;</string>
+    <string name="wi_night_alt_hail">&#xf024;</string>
+    <string name="wi_night_alt_rain_mix">&#xf026;</string>
+    <string name="wi_night_alt_rain_wind">&#xf027;</string>
+    <string name="wi_night_alt_rain">&#xf028;</string>
+    <string name="wi_night_alt_showers">&#xf029;</string>
+    <string name="wi_night_alt_snow">&#xf02a;</string>
+    <string name="wi_night_alt_storm_showers">&#xf02c;</string>
+    <string name="wi_night_alt_thunderstorm">&#xf02d;</string>
+    <string name="wi_night_clear">&#xf02e;</string>
+    <string name="wi_night_cloudy_gusts">&#xf02f;</string>
+    <string name="wi_night_cloudy_windy">&#xf030;</string>
+    <string name="wi_night_cloudy">&#xf031;</string>
+
+    <string name="wi_celcius">&#xf03c;</string>
+    <string name="wi_fahrenheit">&#xf045;</string>
+
 </resources>

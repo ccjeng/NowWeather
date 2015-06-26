@@ -1,16 +1,20 @@
 package com.oddsoft.nowweather;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.support.v7.app.ActionBarActivity;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,18 +24,23 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.oddsoft.nowweather.app.JsonRequest;
 import com.oddsoft.nowweather.app.Singleton;
+import com.oddsoft.nowweather.app.Utils;
+import com.oddsoft.nowweather.icon.Weather;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
 
     final String TAG = "MainActivity";
     ImageView mImageView;
-    TextView mTxtDegrees, mTxtWeather, mTxtError;
+    TextView mTxtCity, mTxtDegrees, mTxtWeather, mTxtDetail, mTxtUpdate, mTxtError;
 
     Singleton helper = Singleton.getInstance();
     //int today = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
@@ -39,17 +48,17 @@ public class MainActivity extends ActionBarActivity {
     //SharedPreferences mSharedPref;
 
     String weatherKeyword;
-
+    Typeface weatherFont;
 
     final static String
             FLICKR_API_KEY = "dc7cb6cc8e546dd0fb6d3a1ba5bfa971",
             IMAGES_API_ENDPOINT = "https://api.flickr.com/services/rest/?format=json&nojsoncallback=1&sort=random&method=flickr.photos.search&" +
-                           "&tag_mode=all&api_key=",
+                    "&group_id=1463451@N25&tag_mode=all&api_key=",
 
-            RECENT_API_ENDPOINT = "http://api.openweathermap.org/data/2.5/weather?";
+    RECENT_API_ENDPOINT = "http://api.openweathermap.org/data/2.5/weather?";
 
     //SHARED_PREFS_IMG_KEY = "img",
-     //       SHARED_PREFS_DAY_KEY = "day";
+    //       SHARED_PREFS_DAY_KEY = "day";
 
 
     @Override
@@ -59,13 +68,35 @@ public class MainActivity extends ActionBarActivity {
 
         // Views setup
         mImageView = (ImageView) findViewById(R.id.main_bg);
+        mTxtCity = (TextView) findViewById(R.id.city);
         mTxtDegrees = (TextView) findViewById(R.id.degrees);
         mTxtWeather = (TextView) findViewById(R.id.weather);
+        mTxtDetail = (TextView) findViewById(R.id.detail);
+        mTxtUpdate = (TextView) findViewById(R.id.update);
         mTxtError = (TextView) findViewById(R.id.error);
 
+
         // Font
-        //mTxtDegrees.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
-        //mTxtWeather.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
+        mTxtWeather.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/weather.ttf"));
+        mTxtCity.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
+        mTxtDegrees.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
+        mTxtDetail.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
+        mTxtUpdate.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
+
+        // Backgrand Transparent
+        getActionBar().setBackgroundDrawable(new ColorDrawable(android.R.color.transparent));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Window window = getWindow();
+            // Translucent status bar
+            window.setFlags(
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            // Translucent navigation bar
+            window.setFlags(
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        }
 
         // SharedPreferences setup
         //mSharedPref = getPreferences(Context.MODE_PRIVATE);
@@ -73,8 +104,6 @@ public class MainActivity extends ActionBarActivity {
 
         // Weather data
         loadWeatherData();
-
-
 
 
     }
@@ -88,6 +117,7 @@ public class MainActivity extends ActionBarActivity {
 
     /**
      * Fetches a random picture of Mars, using Flickr APIs, and then displays it.
+     *
      * @throws Exception When a working API key is not provided.
      */
     private void searchRandomImage(String keyword) throws Exception {
@@ -96,9 +126,9 @@ public class MainActivity extends ActionBarActivity {
 
         Log.d(TAG, "searchRandomImage = " + keyword);
 
-        String tag = "&tags="+keyword+",weather";
+        String tag = "&tags=" + keyword + ",weather";
         JsonRequest request = new JsonRequest
-                (Request.Method.GET, IMAGES_API_ENDPOINT+FLICKR_API_KEY+tag, null, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, IMAGES_API_ENDPOINT + FLICKR_API_KEY + tag, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -110,9 +140,11 @@ public class MainActivity extends ActionBarActivity {
 
                             JSONObject imageItem = images.getJSONObject(index);
 
-                            String imageUrl = "http://farm" + imageItem.getString("farm") +
-                                    ".static.flickr.com/" + imageItem.getString("server") + "/" +
-                                    imageItem.getString("id") + "_" + imageItem.getString("secret") + "_" + "c.jpg";
+                            Utils url = new Utils();
+                            String imageUrl = url.getFlickrImageURL(imageItem.getString("farm")
+                                    , imageItem.getString("server")
+                                    , imageItem.getString("id")
+                                    , imageItem.getString("secret"));
 
                             // store the pict of the day
                             //SharedPreferences.Editor editor = mSharedPref.edit();
@@ -142,6 +174,7 @@ public class MainActivity extends ActionBarActivity {
 
     /**
      * Downloads and displays the picture using Volley.
+     *
      * @param imageUrl the URL of the picture.
      */
     private void loadImg(String imageUrl) {
@@ -171,7 +204,7 @@ public class MainActivity extends ActionBarActivity {
     private void loadWeatherData() {
 
         JsonRequest request = new JsonRequest
-                (Request.Method.GET, RECENT_API_ENDPOINT+"units=metric&lat=25.0925009&lon=121.5312909", null, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, RECENT_API_ENDPOINT + "units=metric&lat=25.0925009&lon=121.5312909", null, new Response.Listener<JSONObject>() {
 
                     //For temperature in Fahrenheit use units=imperial
                     //For temperature in Celsius use units=metric
@@ -181,31 +214,7 @@ public class MainActivity extends ActionBarActivity {
                         // if you want to debug: Log.v(getString(R.string.app_name), response.toString());
                         try {
 
-                            String minTemp, maxTemp, curTemp, atmo="";
-                            double avgTemp;
-
-                            JSONArray wArray= (JSONArray) response.getJSONArray("weather");
-
-                            for (int i = 0; i < wArray.length(); i++)
-                            {
-                                atmo = wArray.getJSONObject(i).getString("main");
-                                weatherKeyword = atmo;
-                            }
-
-
-                            Log.d(TAG, "weatherKeyword = " + weatherKeyword);
-
-                            //minTemp = response.getString("min_temp"); minTemp = minTemp.substring(0, minTemp.indexOf("."));
-                            //maxTemp = response.getString("max_temp"); maxTemp = maxTemp.substring(0, maxTemp.indexOf("."));
-
-                            curTemp = response.getJSONObject("main").getString("temp");
-
-
-                            avgTemp = Double.parseDouble(curTemp); //(Integer.parseInt(minTemp)+Integer.parseInt(maxTemp))/2;
-
-
-                            mTxtDegrees.setText(avgTemp+"°");
-                            mTxtWeather.setText(atmo);
+                            renderWeather(response);
 
                             // Picture
                             // search and load a random mars pict.
@@ -237,6 +246,41 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
+    private void renderWeather(JSONObject json) {
+        try {
+
+            JSONObject details = json.getJSONArray("weather").getJSONObject(0);
+            JSONObject main = json.getJSONObject("main");
+
+            weatherKeyword = details.getString("main");
+
+            mTxtDetail.setText(
+                    details.getString("description").toUpperCase(Locale.US) +
+                            "\n" + getString(R.string.humidity) + ": " + main.getString("humidity") + "%" +
+                            "\n" + getString(R.string.pressure) + ": " + main.getString("pressure") + " hPa");
+
+            mTxtDegrees.setText(
+                    String.format("%.2f", main.getDouble("temp")) + " ℃");
+
+            DateFormat df = DateFormat.getDateTimeInstance();
+            String updatedOn = df.format(new Date(json.getLong("dt") * 1000));
+
+            getActionBar().setTitle(json.getString("name").toUpperCase(Locale.US) +
+                    ", " +
+                    json.getJSONObject("sys").getString("country"));
+            getActionBar().setSubtitle(updatedOn);
+
+            Weather w = new Weather();
+            int icon = w.getWeatherIcon(details.getInt("id"),
+                    json.getJSONObject("sys").getLong("sunrise") * 1000,
+                    json.getJSONObject("sys").getLong("sunset") * 1000);
+            mTxtWeather.setText(icon);
+
+        } catch (Exception e) {
+            Log.e(TAG, "One or more fields not found in the JSON data");
+        }
+    }
+
     private void imageError(Exception e) {
         mImageView.setBackgroundColor(mainColor);
         e.printStackTrace();
@@ -246,7 +290,6 @@ public class MainActivity extends ActionBarActivity {
         mTxtError.setVisibility(View.VISIBLE);
         e.printStackTrace();
     }
-
 
 
     @Override
@@ -264,9 +307,9 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }

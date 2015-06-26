@@ -4,26 +4,16 @@
     android:orientation="vertical">
 
     <RelativeLayout
+        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.68"
-        android:background="#FF5722">
+        android:paddingTop="@dimen/activity_horizontal_margin"
+        android:background="#FF0099CC">
 
         <ImageView
             android:id="@+id/main_bg"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"/>
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_weight="0.33"
-        android:layout_height="0dp"
-        android:layout_width="match_parent"
-        android:paddingTop="@dimen/activity_horizontal_margin"
-        android:background="#212121"
-        android:elevation="8dp">
 
         <TextView
             android:id="@+id/error"
@@ -32,18 +22,28 @@
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:textSize="20sp"
-            android:textColor="#FF5722"
+            android:textColor="@color/red"
             android:layout_margin="@dimen/activity_horizontal_margin"
             android:gravity="center"
             android:text="I'm sorry.\nI wasn't able to retrieve real time data."/>
+
+        <TextView
+            android:id="@+id/city"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textSize="30sp"
+            android:textColor="@color/write"
+            android:text=""/>
 
         <TextView
             android:id="@+id/degrees"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:layout_centerHorizontal="true"
+            android:layout_below="@id/city"
             android:textSize="90sp"
-            android:textColor="#FF5722"
+            android:textColor="@color/write"
             android:text="-36°"/>
 
         <TextView
@@ -52,11 +52,32 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_below="@id/degrees"
+            android:textSize="120sp"
+            android:gravity="center"
+            android:textColor="@color/write"
+            android:text=""/>
+
+        <TextView
+            android:id="@+id/detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/weather"
             android:textSize="30sp"
             android:gravity="center"
-            android:textColor="#FF5722"
-            android:text="Sunny"/>
+            android:textColor="@color/write"
+            android:text=""/>
 
+        <TextView
+            android:id="@+id/update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/detail"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:textColor="@color/write"
+            android:text=""/>
     </RelativeLayout>
 
 </LinearLayout>
