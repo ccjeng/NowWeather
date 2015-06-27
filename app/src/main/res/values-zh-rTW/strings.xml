@@ -6,6 +6,8 @@
 
     <string name="humidity">濕度</string>
     <string name="pressure">壓力</string>
+    <string name="wind">風速</string>
+    <string name="cloudiness">雲量</string>
 
     <string name="network_error">Network is not available</string>
     <string name="location_error">GPS is not available</string>
