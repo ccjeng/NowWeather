@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -294,9 +295,16 @@ public class MainActivity extends Activity
             //myLoc.setLongitude(121.43847);
 
             //Taipei City
-            myLoc.setLatitude(25.0950492);
-            myLoc.setLongitude(121.5246077);
+            //myLoc.setLatitude(25.0950492);
+            //myLoc.setLongitude(121.5246077);
 
+            //New York
+            myLoc.setLatitude(40.767504);
+            myLoc.setLongitude(-73.977964);
+
+            //London
+            myLoc.setLatitude(51.486257);
+            myLoc.setLongitude(-0.150507);
         }
 
         if (myLoc != null ) {
@@ -375,17 +383,29 @@ public class MainActivity extends Activity
 
     private void renderWeather(JSONObject json) {
         try {
-
+            //http://www.openweathermap.org/weather-data#current
             JSONObject details = json.getJSONArray("weather").getJSONObject(0);
             JSONObject main = json.getJSONObject("main");
+            JSONObject wind = json.getJSONObject("wind");
+            JSONObject clouds = json.getJSONObject("clouds");
+
 
             weatherKeyword = details.getString("main");
 
+            String windUnit;
+            if (prefUnit.equals("c")) {
+                windUnit = "m/s";
+            } else {
+                windUnit = "mph";
+            }
             mTxtDescr.setText(details.getString("description").toUpperCase(Locale.US));
             mTxtDetail.setText(
-                    main.getString("temp_min") + " ~ " + main.getString("temp_max") +
-                            "\n" + getString(R.string.humidity) + ": " + main.getString("humidity") + "%" +
-                            "\n" + getString(R.string.pressure) + ": " + main.getString("pressure") + " hPa");
+                    main.getString("temp_min") + " ~ " + main.getString("temp_max")
+                            +  "\n" + getString(R.string.humidity) + ": " + main.getString("humidity") + "%"
+                            +  "\n" + getString(R.string.cloudiness) + ": " + clouds.getString("all") + "%"
+                            +  "\n" + getString(R.string.wind) + ": " + wind.getString("speed") + " " + windUnit
+                    //+  "\n" + getString(R.string.pressure) + ": " + main.getString("pressure") + " hPa"
+            );
 
             mTxtDegrees.setText(
                     String.format("%.2f", main.getDouble("temp")));
@@ -433,6 +453,8 @@ public class MainActivity extends Activity
         getActionBar().setHomeButtonEnabled(true);
         // Backgrand Transparent
         getActionBar().setBackgroundDrawable(new ColorDrawable(android.R.color.transparent));
+        //Set screen Portrait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             Window window = getWindow();
@@ -524,7 +546,7 @@ public class MainActivity extends Activity
                 startActivity(new Intent(this, PrefActivity.class));
                 break;
             case 1:
-                //startActivity(new Intent(this, AboutActivity.class));
+                startActivity(new Intent(this, AboutActivity.class));
                 break;
         }
 

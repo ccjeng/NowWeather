@@ -7,6 +7,4 @@
         android:icon="@android:drawable/ic_menu_revert"
         android:orderInCategory="100"
         android:showAsAction="always" />
-
-
 </menu>

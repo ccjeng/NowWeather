@@ -8,14 +8,16 @@
     <string name="refresh_button">Refresh</string>
     <string name="humidity">Humidity</string>
     <string name="pressure">Pressure</string>
+    <string name="wind">Wind</string>
+    <string name="cloudiness">Cloudiness</string>
 
     <string name="network_error">Network is not available</string>
     <string name="location_error">GPS is not available</string>
     <string name="google_play_service_missing">Google Play Service is Missing</string>
     <string name="ok_label">OK</string>
 
-    <string name="pref_unit">Unit</string>
-    <string name="pref_unit_summary">Unit Setup</string>
+    <string name="pref_unit">Weather Unit</string>
+    <string name="pref_unit_summary">Unit of measure</string>
     <string-array name="pref_unit_item">
         <item>Celsius (C)</item>
         <item>Fahrenheit (F)</item>
@@ -29,6 +31,33 @@
         <item>Setting</item>
         <item>About</item>
     </string-array>
+
+ <string name="license">Copyright (c) 2015 ccjeng@google.com\n
+     \n
+     \nWeather Data: Open Weather Map
+     \nhttp://www.openweathermap.org
+     \n\n
+     \nBackground Image: Flickr Project Weather
+     \nhttps://www.flickr.com/groups/projectweather
+     \n\n
+     \nWeather Icon: Erik Flowers
+     \nhttp://erikflowers.github.io/weather-icons
+     \n\n
+     \nApp Icon: Easy Icon
+     \nhttp://www.easyicon.net/1184331-Weather_icon.html
+     \n\n
+     \nLibrary: Android Volley
+     \nhttps://android.googlesource.com/platform/frameworks/volley
+\n
+\n
+\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+</string>
 
     <!--http://erikflowers.github.io/weather-icons/cheatsheet/-->
 
