@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NowWeather</string>
+
+    <string name="action_settings">設定</string>
+
+    <string name="humidity">濕度</string>
+    <string name="pressure">壓力</string>
+
+    <string name="network_error">Network is not available</string>
+    <string name="location_error">GPS is not available</string>
+    <string name="google_play_service_missing">尚未安裝Google Play Service</string>
+    <string name="ok_label">確定</string>
+
+</resources>

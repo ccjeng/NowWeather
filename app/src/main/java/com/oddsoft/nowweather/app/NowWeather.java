@@ -11,7 +11,7 @@ public class NowWeather extends Application {
     public static final String TAG = NowWeather.class.getSimpleName();
 
     // Debugging switch
-    public static final boolean APPDEBUG = false;
+    public static final boolean APPDEBUG = true;
 
     public static final String FLICKR_API_KEY = "dc7cb6cc8e546dd0fb6d3a1ba5bfa971";
 

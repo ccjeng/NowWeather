@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/action_settings">
+        <ListPreference
+            android:title="@string/pref_unit"
+            android:summary="@string/pref_unit_summary"
+            android:key="unit"
+            android:defaultValue="c"
+            android:entries="@array/pref_unit_item"
+            android:entryValues="@array/pref_unit_code" />
+
+    </PreferenceCategory>
+</PreferenceScreen>

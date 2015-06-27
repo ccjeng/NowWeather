@@ -5,6 +5,9 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -14,13 +17,21 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -42,7 +53,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
@@ -51,16 +65,16 @@ public class MainActivity extends Activity
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    final String TAG = NowWeather.TAG;
-    ImageView mImageView;
-    TextView mTxtCity, mTxtDegrees, mTxtWeather, mTxtDetail, mTxtUpdate, mTxtError;
+    private final String TAG = NowWeather.TAG;
+    private ImageView mImageView;
+    private TextView mTxtCity, mTxtDegrees, mTxtDescr, mTxtWeather, mTxtDetail, mTxtUpdate, mTxtError;
 
-    NowWeather helper = NowWeather.getInstance();
+    private NowWeather helper = NowWeather.getInstance();
     //int today = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-    int mainColor = Color.parseColor("#FF5722");
+    private int mainColor = Color.parseColor("#FF5722");
     //SharedPreferences mSharedPref;
 
-    String weatherKeyword;
+    private String weatherKeyword;
 
     final static String
             FLICKR_API_KEY = NowWeather.FLICKR_API_KEY,
@@ -68,6 +82,17 @@ public class MainActivity extends Activity
                     "&group_id=1463451@N25&tag_mode=all&api_key=",
 
     RECENT_API_ENDPOINT = "http://api.openweathermap.org/data/2.5/weather?";
+
+
+    private String prefUnit;
+
+    private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private LinearLayout mLlvDrawerContent;
+    private ListView mLsvDrawerMenu;
+
+    // 記錄被選擇的選單指標用
+    private int mCurrentMenuItemPosition = -1;
 
     //SHARED_PREFS_IMG_KEY = "img",
     //       SHARED_PREFS_DAY_KEY = "day";
@@ -116,36 +141,21 @@ public class MainActivity extends Activity
 
         // Views setup
         mImageView = (ImageView) findViewById(R.id.main_bg);
-        mTxtCity = (TextView) findViewById(R.id.city);
         mTxtDegrees = (TextView) findViewById(R.id.degrees);
         mTxtWeather = (TextView) findViewById(R.id.weather);
+        mTxtDescr = (TextView) findViewById(R.id.description);
         mTxtDetail = (TextView) findViewById(R.id.detail);
-        mTxtUpdate = (TextView) findViewById(R.id.update);
         mTxtError = (TextView) findViewById(R.id.error);
 
-
         // Font
-        mTxtWeather.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/weather.ttf"));
-        mTxtCity.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
+        mTxtWeather.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/weather1.3.ttf"));
         mTxtDegrees.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
+        mTxtDescr.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
         mTxtDetail.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
-        mTxtUpdate.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
 
-        getActionBar().setDisplayShowHomeEnabled(false);
-        // Backgrand Transparent
-        getActionBar().setBackgroundDrawable(new ColorDrawable(android.R.color.transparent));
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Window window = getWindow();
-            // Translucent status bar
-            window.setFlags(
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            // Translucent navigation bar
-            window.setFlags(
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-        }
+        initActionBar();
+        initDrawer();
+        initDrawerList();
 
         if (isNetworkConnected()) {
             // 建立Google API用戶端物件
@@ -187,11 +197,18 @@ public class MainActivity extends Activity
         if (FLICKR_API_KEY.equals(""))
             throw new Exception("You didn't provide a working Flickr API key!");
 
-        Log.d(TAG, "searchRandomImage = " + keyword);
+        if (keyword.equals("Additional"))
+                keyword = "weather";
 
         String tag = "&tags=" + keyword ;//+ ",weather";
+
+        String url = IMAGES_API_ENDPOINT + FLICKR_API_KEY + tag;
+        if (NowWeather.APPDEBUG) {
+            Log.d(TAG, "searchRandomImage = " + keyword);
+            Log.d(TAG, url);
+        }
         JsonRequest request = new JsonRequest
-                (Request.Method.GET, IMAGES_API_ENDPOINT + FLICKR_API_KEY + tag, null, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -266,6 +283,8 @@ public class MainActivity extends Activity
      */
     private void loadWeatherData() {
 
+        getPreferences();
+
         myLoc = (currentLocation == null) ? lastLocation : currentLocation;
 
         //fake location
@@ -284,9 +303,14 @@ public class MainActivity extends Activity
 
             Utils utils = new Utils();
             String languageInfo = "&lang=" + utils.getLanguageCode();
-            //&lat=25.0925009&lon=121.5312909
             String locationInfo = "&lat=" + myLoc.getLatitude()+"&lon="+myLoc.getLongitude();
-            String requestURL = RECENT_API_ENDPOINT + "units=metric" + locationInfo + languageInfo;
+            String unitInfo = "";
+            if (prefUnit.equals("c")) {
+                unitInfo = "units=metric";
+            } else {
+                unitInfo = "units=imperial";
+            }
+            String requestURL = RECENT_API_ENDPOINT + unitInfo + locationInfo + languageInfo;
             if (NowWeather.APPDEBUG)
                 Log.d(TAG, requestURL);
 
@@ -357,13 +381,14 @@ public class MainActivity extends Activity
 
             weatherKeyword = details.getString("main");
 
+            mTxtDescr.setText(details.getString("description").toUpperCase(Locale.US));
             mTxtDetail.setText(
-                    details.getString("description").toUpperCase(Locale.US) +
+                    main.getString("temp_min") + " ~ " + main.getString("temp_max") +
                             "\n" + getString(R.string.humidity) + ": " + main.getString("humidity") + "%" +
                             "\n" + getString(R.string.pressure) + ": " + main.getString("pressure") + " hPa");
 
             mTxtDegrees.setText(
-                    String.format("%.2f", main.getDouble("temp")) + " ℃");
+                    String.format("%.2f", main.getDouble("temp")));
 
             DateFormat df = DateFormat.getDateTimeInstance();
             String updatedOn = df.format(new Date(json.getLong("dt") * 1000));
@@ -394,6 +419,133 @@ public class MainActivity extends Activity
         e.printStackTrace();
     }
 
+    private void getPreferences() {
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(getBaseContext());
+        prefUnit = prefs.getString("unit", "c");
+
+    }
+
+    private void initActionBar(){
+        //顯示 Up Button (位在 Logo 左手邊的按鈕圖示)
+        getActionBar().setDisplayHomeAsUpEnabled(false);
+        //打開 Up Button 的點擊功能
+        getActionBar().setHomeButtonEnabled(true);
+        // Backgrand Transparent
+        getActionBar().setBackgroundDrawable(new ColorDrawable(android.R.color.transparent));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Window window = getWindow();
+            // Translucent status bar
+            window.setFlags(
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            // Translucent navigation bar
+            window.setFlags(
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        }
+
+    }
+
+    private void initDrawer() {
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drw_layout);
+        // 設定 Drawer 的影子
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,
+                mDrawerLayout,    // 讓 Drawer Toggle 知道母體介面是誰
+                R.drawable.ic_drawer, // Drawer 的 Icon
+                R.string.app_name, // Drawer 被打開時的描述
+                R.string.app_name // Drawer 被關閉時的描述
+        ) {
+            //被打開後要做的事情
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                // 將 Title 設定為自定義的文字
+                //getActionBar().setTitle(R.string.app_name);
+            }
+
+            //被關上後要做的事情
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                // 將 Title 設定回 APP 的名稱
+                //getActionBar().setTitle(R.string.app_name);
+            }
+        };
+
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
+
+    private void initDrawerList() {
+
+        String[] drawer_menu = this.getResources().getStringArray(R.array.drawer_menu);
+
+        // 定義新宣告的兩個物件：選項清單的 ListView 以及 Drawer內容的 LinearLayou
+        mLsvDrawerMenu = (ListView) findViewById(R.id.lsv_drawer_menu);
+        mLlvDrawerContent = (LinearLayout) findViewById(R.id.llv_left_drawer);
+
+        int[] iconImage = { android.R.drawable.ic_menu_preferences
+                , android.R.drawable.ic_dialog_info };
+
+        List<HashMap<String,String>> lstData = new ArrayList<HashMap<String,String>>();
+        for (int i = 0; i < iconImage.length; i++) {
+            HashMap<String, String> mapValue = new HashMap<String, String>();
+            mapValue.put("icon", Integer.toString(iconImage[i]));
+            mapValue.put("title", drawer_menu[i]);
+            lstData.add(mapValue);
+        }
+
+
+        SimpleAdapter adapter = new SimpleAdapter(this, lstData
+                , R.layout.drawer_item
+                , new String[]{"icon", "title"}
+                , new int[]{R.id.rowIcon, R.id.rowText});
+        mLsvDrawerMenu.setAdapter(adapter);
+
+        // 當清單選項的子物件被點擊時要做的動作
+        mLsvDrawerMenu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                selectMenuItem(position);
+            }
+        });
+
+    }
+
+    private void selectMenuItem(int position) {
+        mCurrentMenuItemPosition = position;
+
+        switch (mCurrentMenuItemPosition) {
+            case 0:
+                startActivity(new Intent(this, PrefActivity.class));
+                break;
+            case 1:
+                //startActivity(new Intent(this, AboutActivity.class));
+                break;
+        }
+
+        // 將選單的子物件設定為被選擇的狀態
+        mLsvDrawerMenu.setItemChecked(position, true);
+
+        // 關掉 Drawer
+        mDrawerLayout.closeDrawer(mLlvDrawerContent);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -407,13 +559,15 @@ public class MainActivity extends Activity
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+            case R.id.refresh_settings:
+                loadWeatherData();
+                return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
