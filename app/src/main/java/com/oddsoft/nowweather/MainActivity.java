@@ -39,12 +39,14 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
+import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.oddsoft.nowweather.app.Analytics;
 import com.oddsoft.nowweather.app.JsonRequest;
 import com.oddsoft.nowweather.app.NowWeather;
 import com.oddsoft.nowweather.app.Utils;
@@ -138,6 +140,7 @@ public class MainActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         // Views setup
@@ -153,6 +156,11 @@ public class MainActivity extends Activity
         mTxtDegrees.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
         mTxtDescr.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
         mTxtDetail.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
+
+        Analytics ga = new Analytics();
+        //if (!NowWeather.APPDEBUG)
+            ga.initTracker(this);
+
 
         initActionBar();
         initDrawer();
@@ -285,6 +293,7 @@ public class MainActivity extends Activity
     private void loadWeatherData() {
 
         getPreferences();
+        mTxtError.setVisibility(View.GONE);
 
         myLoc = (currentLocation == null) ? lastLocation : currentLocation;
 
@@ -430,7 +439,7 @@ public class MainActivity extends Activity
     }
 
     private void imageError(Exception e) {
-        mImageView.setBackgroundColor(mainColor);
+        //mImageView.setBackgroundColor(mainColor);
         e.printStackTrace();
     }
 
@@ -456,14 +465,18 @@ public class MainActivity extends Activity
         //Set screen Portrait
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        //hide notification bar
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Window window = getWindow();
             // Translucent status bar
-            window.setFlags(
+            getWindow().setFlags(
                     WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
                     WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             // Translucent navigation bar
-            window.setFlags(
+            getWindow().setFlags(
                     WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
                     WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         }
@@ -604,6 +617,9 @@ public class MainActivity extends Activity
         super.onStop();
         // This will tell to Volley to cancel all the pending requests
         helper.cancel();
+
+        if (!NowWeather.APPDEBUG)
+            GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
 
     /*
@@ -616,6 +632,9 @@ public class MainActivity extends Activity
         if (locationClient != null) {
             locationClient.connect();
         }
+
+        if (!NowWeather.APPDEBUG)
+            GoogleAnalytics.getInstance(this).reportActivityStart(this);
     }
 
     @Override
