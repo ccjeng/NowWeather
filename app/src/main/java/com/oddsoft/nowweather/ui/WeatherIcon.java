@@ -1,6 +1,4 @@
-package com.oddsoft.nowweather.icon;
-
-import android.app.Activity;
+package com.oddsoft.nowweather.ui;
 
 import com.oddsoft.nowweather.R;
 
@@ -9,7 +7,7 @@ import java.util.Date;
 /**
  * Created by andycheng on 2015/6/26.
  */
-public class Weather {
+public class WeatherIcon {
 
     public int getWeatherIcon(int actualId, long sunrise, long sunset) {
         //int id = actualId / 100;
@@ -18,11 +16,11 @@ public class Weather {
         Boolean night = false;
         long currentTime = new Date().getTime();
         if (currentTime >= sunrise && currentTime < sunset) {
-                //icon = (R.string.weather_sunny);
+            //icon = (R.string.weather_sunny);
             night = false;
         } else {
             night = true;
-                //icon = (R.string.weather_clear_night);
+            //icon = (R.string.weather_clear_night);
         }
 
         switch (actualId) {

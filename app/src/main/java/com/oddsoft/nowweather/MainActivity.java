@@ -26,7 +26,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -50,7 +49,7 @@ import com.oddsoft.nowweather.app.Analytics;
 import com.oddsoft.nowweather.app.JsonRequest;
 import com.oddsoft.nowweather.app.NowWeather;
 import com.oddsoft.nowweather.app.Utils;
-import com.oddsoft.nowweather.icon.Weather;
+import com.oddsoft.nowweather.ui.WeatherIcon;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -88,6 +87,7 @@ public class MainActivity extends Activity
 
 
     private String prefUnit;
+    private Boolean prefEng;
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -327,6 +327,11 @@ public class MainActivity extends Activity
             } else {
                 unitInfo = "units=imperial";
             }
+
+            if (prefEng) {
+                languageInfo = "&lang=en";
+            }
+
             String requestURL = RECENT_API_ENDPOINT + unitInfo + locationInfo + languageInfo;
             if (NowWeather.APPDEBUG)
                 Log.d(TAG, requestURL);
@@ -407,6 +412,7 @@ public class MainActivity extends Activity
             } else {
                 windUnit = "mph";
             }
+
             mTxtDescr.setText(details.getString("description").toUpperCase(Locale.US));
             mTxtDetail.setText(
                     main.getString("temp_min") + " ~ " + main.getString("temp_max")
@@ -427,7 +433,7 @@ public class MainActivity extends Activity
                     json.getJSONObject("sys").getString("country"));
             getActionBar().setSubtitle(updatedOn);
 
-            Weather w = new Weather();
+            WeatherIcon w = new WeatherIcon();
             int icon = w.getWeatherIcon(details.getInt("id"),
                     json.getJSONObject("sys").getLong("sunrise") * 1000,
                     json.getJSONObject("sys").getLong("sunset") * 1000);
@@ -449,9 +455,12 @@ public class MainActivity extends Activity
     }
 
     private void getPreferences() {
+
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(getBaseContext());
         prefUnit = prefs.getString("unit", "c");
+        prefEng = prefs.getBoolean("eng", false);
+
 
     }
 

@@ -5,9 +5,9 @@ android {
     buildToolsVersion "22.0.1"
     defaultConfig {
         applicationId "com.oddsoft.nowweather"
-        minSdkVersion 21
+        minSdkVersion 19
         targetSdkVersion 22
-        versionCode 3
+        versionCode 4
         versionName '0.0.1'
     }
     buildTypes {
