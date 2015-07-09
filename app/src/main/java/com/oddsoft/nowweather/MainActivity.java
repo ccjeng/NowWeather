@@ -69,7 +69,8 @@ public class MainActivity extends Activity
 
     private final String TAG = NowWeather.TAG;
     private ImageView mImageView;
-    private TextView mTxtCity, mTxtDegrees, mTxtDescr, mTxtWeather, mTxtDetail, mTxtUpdate, mTxtError;
+    private TextView mTxtCity, mTxtDegrees, mTxtDescr, mTxtWeather, mTxtTempRange, mTxtHumidity
+            , mTxtCloudiness, mTxtWind, mTxtError;
 
     private NowWeather helper = NowWeather.getInstance();
     //int today = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
@@ -148,19 +149,33 @@ public class MainActivity extends Activity
         mTxtDegrees = (TextView) findViewById(R.id.degrees);
         mTxtWeather = (TextView) findViewById(R.id.weather);
         mTxtDescr = (TextView) findViewById(R.id.description);
-        mTxtDetail = (TextView) findViewById(R.id.detail);
+        mTxtTempRange = (TextView) findViewById(R.id.temprange);
+        mTxtHumidity = (TextView) findViewById(R.id.humidity);
+        mTxtCloudiness = (TextView) findViewById(R.id.cloudiness);
+        mTxtWind = (TextView) findViewById(R.id.wind);
         mTxtError = (TextView) findViewById(R.id.error);
 
         // Font
         mTxtWeather.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/weather1.3.ttf"));
         mTxtDegrees.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
         mTxtDescr.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
-        mTxtDetail.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
+        mTxtTempRange.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
+        mTxtTempRange.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
+        mTxtHumidity.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
+        mTxtCloudiness.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
+        mTxtWind.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
+
 
         Analytics ga = new Analytics();
-        //if (!NowWeather.APPDEBUG)
+        if (!NowWeather.APPDEBUG)
             ga.initTracker(this);
 
+
+        //Load Default Value
+        mTxtTempRange.setText("-- ~ --");
+        mTxtHumidity.setText(getString(R.string.humidity) + ": -- %");
+        mTxtCloudiness.setText(getString(R.string.cloudiness) + ": -- %");
+        mTxtWind.setText(getString(R.string.wind) + ": ---- ");
 
         initActionBar();
         initDrawer();
@@ -414,13 +429,11 @@ public class MainActivity extends Activity
             }
 
             mTxtDescr.setText(details.getString("description").toUpperCase(Locale.US));
-            mTxtDetail.setText(
-                    main.getString("temp_min") + " ~ " + main.getString("temp_max")
-                            +  "\n" + getString(R.string.humidity) + ": " + main.getString("humidity") + "%"
-                            +  "\n" + getString(R.string.cloudiness) + ": " + clouds.getString("all") + "%"
-                            +  "\n" + getString(R.string.wind) + ": " + wind.getString("speed") + " " + windUnit
-                    //+  "\n" + getString(R.string.pressure) + ": " + main.getString("pressure") + " hPa"
-            );
+
+            mTxtTempRange.setText(main.getString("temp_min") + " ~ " + main.getString("temp_max"));
+            mTxtHumidity.setText(getString(R.string.humidity) + ": " + main.getString("humidity") + "%");
+            mTxtCloudiness.setText(getString(R.string.cloudiness) + ": " + clouds.getString("all") + "%");
+            mTxtWind.setText(getString(R.string.wind) + ": " + wind.getString("speed") + " " + windUnit);
 
             mTxtDegrees.setText(
                     String.format("%.2f", main.getDouble("temp")));

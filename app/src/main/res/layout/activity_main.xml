@@ -35,7 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:textSize="50sp"
+            android:textSize="40sp"
             android:textColor="@color/write"
             android:text=" "/>
 
@@ -71,13 +71,46 @@
             android:textColor="@color/write"
             android:text=""/>
 
-        <TextView
-            android:id="@+id/detail"
+        <com.oddsoft.nowweather.ui.AutoScaleTextView
+            android:id="@+id/temprange"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_below="@id/description"
-            android:textSize="30sp"
+            android:textSize="35sp"
+            android:gravity="right"
+            android:textColor="@color/write"
+            android:text=""/>
+
+        <com.oddsoft.nowweather.ui.AutoScaleTextView
+            android:id="@+id/humidity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/temprange"
+            android:textSize="35sp"
+            android:gravity="right"
+            android:textColor="@color/write"
+            android:text=""/>
+
+        <com.oddsoft.nowweather.ui.AutoScaleTextView
+            android:id="@+id/cloudiness"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/humidity"
+            android:textSize="35sp"
+            android:gravity="right"
+            android:textColor="@color/write"
+            android:text=""/>
+
+        <com.oddsoft.nowweather.ui.AutoScaleTextView
+            android:id="@+id/wind"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/cloudiness"
+            android:textSize="35sp"
             android:gravity="right"
             android:textColor="@color/write"
             android:text=""/>
