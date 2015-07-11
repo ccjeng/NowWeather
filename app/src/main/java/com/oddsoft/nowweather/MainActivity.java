@@ -1,5 +1,9 @@
 package com.oddsoft.nowweather;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -27,6 +31,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -138,6 +148,8 @@ public class MainActivity extends Activity
     // Stores the current instantiation of the location client in this object
     private GoogleApiClient locationClient;
 
+    private AnimatorSet mAnimationSet;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -170,6 +182,43 @@ public class MainActivity extends Activity
         if (!NowWeather.APPDEBUG)
             ga.initTracker(this);
 
+        //Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.alpha);
+        //mImageView.startAnimation(animation);
+/*
+        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(mImageView, "alpha",  1f, .3f);
+        fadeOut.setDuration(1000);
+        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(mImageView, "alpha", .3f, 1f);
+        fadeIn.setDuration(1000);
+
+
+        mAnimationSet = new AnimatorSet();
+
+        mAnimationSet.play(fadeIn).after(fadeOut);
+
+        mAnimationSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                mAnimationSet.start();
+            }
+        });
+
+        mAnimationSet.start();
+*/
+
+        Animation fadeIn = new AlphaAnimation(0, 1);
+        fadeIn.setInterpolator(new DecelerateInterpolator()); //add this
+        fadeIn.setDuration(1000);
+
+        Animation fadeOut = new AlphaAnimation(1, 0);
+        fadeOut.setInterpolator(new AccelerateInterpolator()); //and this
+        fadeOut.setStartOffset(1000);
+        fadeOut.setDuration(1000);
+
+        AnimationSet animation = new AnimationSet(false); //change to false
+        animation.addAnimation(fadeIn);
+        animation.addAnimation(fadeOut);
+        mImageView.setAnimation(animation);
 
         //Load Default Value
         mTxtTempRange.setText("-- ~ --");
@@ -259,6 +308,7 @@ public class MainActivity extends Activity
                             // and finally load it
                             loadImg(imageUrl);
 
+
                         } catch (Exception e) {
                             imageError(e);
                         }
@@ -287,7 +337,10 @@ public class MainActivity extends Activity
                 new Response.Listener<Bitmap>() {
                     @Override
                     public void onResponse(Bitmap bitmap) {
+
+                        //Set new image
                         mImageView.setImageBitmap(bitmap);
+                        //mAnimationSet.end();
                     }
                 }, 0, 0, ImageView.ScaleType.CENTER_CROP, Bitmap.Config.ARGB_8888,
                 new Response.ErrorListener() {
@@ -296,11 +349,9 @@ public class MainActivity extends Activity
                     }
                 });
 
-        // we don't need to set the priority here;
-        // ImageRequest already comes in with
-        // priority set to LOW, that is exactly what we need.
         helper.add(request);
     }
+
 
     /**
      * Fetches and displays the weather data of Mars.
