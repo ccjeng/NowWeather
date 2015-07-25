@@ -8,8 +8,8 @@
     android:orientation="vertical">
 
     <RelativeLayout
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
         android:background="@color/background">
 
         <ImageView
@@ -66,9 +66,9 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_below="@id/weather"
-            android:textSize="35sp"
             android:gravity="center"
             android:textColor="@color/write"
+            android:textSize="35sp"
             android:text=""/>
 
         <com.oddsoft.nowweather.ui.AutoScaleTextView
@@ -77,8 +77,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_below="@id/description"
-            android:textSize="35sp"
-            android:gravity="right"
+            android:textSize="25sp"
             android:textColor="@color/write"
             android:text=""/>
 
@@ -88,8 +87,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_below="@id/temprange"
-            android:textSize="35sp"
-            android:gravity="right"
+            android:textSize="25sp"
             android:textColor="@color/write"
             android:text=""/>
 
@@ -99,8 +97,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_below="@id/humidity"
-            android:textSize="35sp"
-            android:gravity="right"
+            android:textSize="25sp"
             android:textColor="@color/write"
             android:text=""/>
 
@@ -110,8 +107,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_below="@id/cloudiness"
-            android:textSize="35sp"
-            android:gravity="right"
+            android:textSize="25sp"
             android:textColor="@color/write"
             android:text=""/>
 
