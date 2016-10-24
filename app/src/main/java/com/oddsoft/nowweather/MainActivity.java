@@ -1,9 +1,5 @@
 package com.oddsoft.nowweather;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -11,12 +7,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -35,7 +29,6 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
-import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -48,14 +41,12 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
-import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.oddsoft.nowweather.app.Analytics;
 import com.oddsoft.nowweather.app.JsonRequest;
 import com.oddsoft.nowweather.app.NowWeather;
 import com.oddsoft.nowweather.app.Utils;
@@ -148,7 +139,6 @@ public class MainActivity extends Activity
     // Stores the current instantiation of the location client in this object
     private GoogleApiClient locationClient;
 
-    private AnimatorSet mAnimationSet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,35 +166,6 @@ public class MainActivity extends Activity
         mTxtHumidity.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
         mTxtCloudiness.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
         mTxtWind.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Lato-light.ttf"));
-
-
-        Analytics ga = new Analytics();
-        if (!NowWeather.APPDEBUG)
-            ga.initTracker(this);
-
-        //Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.alpha);
-        //mImageView.startAnimation(animation);
-/*
-        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(mImageView, "alpha",  1f, .3f);
-        fadeOut.setDuration(1000);
-        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(mImageView, "alpha", .3f, 1f);
-        fadeIn.setDuration(1000);
-
-
-        mAnimationSet = new AnimatorSet();
-
-        mAnimationSet.play(fadeIn).after(fadeOut);
-
-        mAnimationSet.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                mAnimationSet.start();
-            }
-        });
-
-        mAnimationSet.start();
-*/
 
         Animation fadeIn = new AlphaAnimation(0, 1);
         fadeIn.setInterpolator(new DecelerateInterpolator()); //add this
@@ -365,13 +326,8 @@ public class MainActivity extends Activity
 
         //fake location
         if (NowWeather.APPDEBUG) {
+            /*
             myLoc = new Location("");
-            //myLoc.setLatitude(25.175579);
-            //myLoc.setLongitude(121.43847);
-
-            //Taipei City
-            //myLoc.setLatitude(25.0950492);
-            //myLoc.setLongitude(121.5246077);
 
             //New York
             myLoc.setLatitude(40.767504);
@@ -379,7 +335,7 @@ public class MainActivity extends Activity
 
             //London
             myLoc.setLatitude(51.486257);
-            myLoc.setLongitude(-0.150507);
+            myLoc.setLongitude(-0.150507);*/
         }
 
         if (myLoc != null ) {
@@ -398,7 +354,9 @@ public class MainActivity extends Activity
                 languageInfo = "&lang=en";
             }
 
-            String requestURL = RECENT_API_ENDPOINT + unitInfo + locationInfo + languageInfo;
+            String APIKey = "&APPID=0e529c5d4129acabcb50afbeb79d5aea";
+
+            String requestURL = RECENT_API_ENDPOINT + unitInfo + locationInfo + languageInfo + APIKey;
             if (NowWeather.APPDEBUG)
                 Log.d(TAG, requestURL);
 
@@ -418,6 +376,7 @@ public class MainActivity extends Activity
 
                                 // Picture
                                 // search and load a random mars pict.
+                                /*
                                 try {
                                     searchRandomImage(weatherKeyword);
                                 } catch (Exception e) {
@@ -425,7 +384,7 @@ public class MainActivity extends Activity
                                     // otherwise I won't be able to show
                                     // a random Mars picture
                                     imageError(e);
-                                }
+                                }*/
 
 
                             } catch (Exception e) {
@@ -463,6 +422,12 @@ public class MainActivity extends Activity
 
     private void renderWeather(JSONObject json) {
         try {
+
+            /**1. coord(lan and lon),  weather(clear, description,icon)
+             * 2. main(temp, min-temp,max-temp) wind(speed)
+             3. clouds(all and dt)
+             4. sys(sunset, sunrise).
+             5. id(name).*/
             //http://www.openweathermap.org/weather-data#current
             JSONObject details = json.getJSONArray("weather").getJSONObject(0);
             JSONObject main = json.getJSONObject("main");
@@ -529,14 +494,12 @@ public class MainActivity extends Activity
     }
 
     private void initActionBar(){
-        //顯示 Up Button (位在 Logo 左手邊的按鈕圖示)
         getActionBar().setDisplayHomeAsUpEnabled(false);
-        //打開 Up Button 的點擊功能
         getActionBar().setHomeButtonEnabled(true);
         // Backgrand Transparent
-        getActionBar().setBackgroundDrawable(new ColorDrawable(android.R.color.transparent));
+       // getActionBar().setBackgroundDrawable(new ColorDrawable(android.R.color.transparent));
         //Set screen Portrait
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //hide notification bar
         getWindow().setFlags(
@@ -691,8 +654,6 @@ public class MainActivity extends Activity
         // This will tell to Volley to cancel all the pending requests
         helper.cancel();
 
-        if (!NowWeather.APPDEBUG)
-            GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
 
     /*
@@ -706,8 +667,6 @@ public class MainActivity extends Activity
             locationClient.connect();
         }
 
-        if (!NowWeather.APPDEBUG)
-            GoogleAnalytics.getInstance(this).reportActivityStart(this);
     }
 
     @Override
